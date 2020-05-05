@@ -1,17 +1,17 @@
 # -*- encoding utf-8 -*-
-import os, requests, time, sys
+import os, requests, time, sys, decimal, urllib, http.client
 
 #DEFINIÇÃO DE VARIÁVEIS
 x=1
-float(BTC)
-float(BTC_balance)
-float(BTCQ)
-float(BTCQ_balance)
-api_key = "a"
-api_secret = "b"
+api_key = open("C:/users/almeq/Documents/apikey.txt", mode='r')
+api_key = api_key.read()
+api_secret = open("C:/users/almeq/Documents/apisecret.txt", mode='r')
+api_secret = api_secret.read()
+#Já testei essa função de leitura dos arquivos com api e está ok.
+#Preferi deixar dessa forma pq ai eu posso pedir ajuda no código sem expor minha API.
 
 #DEFINIÇÃO DE FUNÇÕES
-def buy_BTCQ
+#def buy_BTCQ
 #requestbuy = https://quantum.atlasquantum.com/api/buy
 #buy BTCQ order a 0.02, usando BTC_balance total
 
@@ -20,21 +20,20 @@ def buy_BTCQ
 #sell BTCQ order a 0.03, usando BTCQ_balance total
 
 #OPERAÇÃO
-while x==1:
+#while x==1:
 
-#login/autenticate
-#requestacesso = requests.get('https://quantum.atlasquantum.com/api/oauth/token')
+acesso = requests.post('https://quantum.atlasquantum.com/api/oauth/token', api_key, api_secret) #login/autenticate
+print(acesso)
 
-#check BTC_balance
-#requestsaldo = requests.get('https://quantum.atlasquantum.com/api/oauth/token')
-
+BTC_balance = requests.get('https://quantum.atlasquantum.com/api/balance/BTC') #check BTC_balance
+print(BTC_balance)
 #if BTC_balance > 0,
-	#buy_BTCQ()
+	#buy_BTCQ() #executar função de comprar BTCQ
 
-#check BTCQ_balance
-
+BTCQ_balance = requests.get('https://quantum.atlasquantum.com/api/balance/BTCQ') #check BTCQ_balance
+print(BTCQ_balance)
 #if BTCQ_balance > 0
-	#sell_BTCQ()
+	#sell_BTCQ() #executar função de vender BTCQ
 
-	print("dormindo 1s")
-	time.sleep(1)
+#	print("Reiniciando Ciclo em 1s")
+#	time.sleep(1)
