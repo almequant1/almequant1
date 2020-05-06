@@ -24,6 +24,7 @@ authjson = json.dumps(auth)
 
 # Login/Autenticação (usar var json)
 acesso = requests.post('https://quantum.atlasquantum.com/api/oauth/token', data = authjson)
+print (acesso.text)
 respostaacesso = json.loads(acesso.text)  #Transformando Json em dicionário para extrair valores dos atributos
 #Vou adicionar depois um ifelse com sucesso/falha de conexão, mas primeiro preciso entender o <Response>
 
@@ -35,31 +36,44 @@ granttoken = {
 granttokenjson = json.dumps(granttoken)
 
 ########## Criando var DIC e var JSON que contém o token validado da sessão ##########
-refreshtoken = {
-					'Authorization': respostaacesso['token_type'] + " " + respostaacesso['refresh_token']
-				}
+refreshtoken = respostaacesso['refresh_token']
 refreshtokenjson = json.dumps(refreshtoken)
 #--------------------------------até aqui o código está 100% ok - já testado.-----------------------------#
 
 													########## DEFINIÇÃO DE FUNÇÕES #########
+
+#HEADER BUY#
+#buy = {
+		#"symbol":"BTC-USDT",
+		#"quantity":BTC_balance,
+		#"price":0.019"
+		#"type":"LIMIT"
+		#}
+#buyjson = json.dumps(buy)
+
 #def buy_BTCQ
-#requestbuy = https://quantum.atlasquantum.com/api/buy
-#buy BTCQ order a 0.019, usando BTC_balance total
+#requestbuy = requests.post('https://quantum.atlasquantum.com/api/buy', data=buyjson) #onde entra a autenticação?
+
+#HEADER SELL#
+
+#sell = {
+		#"symbol":"BTC-USDT",
+		#"quantity":BTCQ_balance,
+		#"price":0.02"
+		#"type":"LIMIT"
+		#}
+#selljson = json.dumps(sell)
 
 #def sell_BTCQ
-#requestsell = https://quantum.atlasquantum.com/api/sell
-#sell BTCQ order a 0.020, usando BTCQ_balance total
+#requestsell = requests.post('https://quantum.atlasquantum.com/api/buy', data=selljson) #onde entra a autenticação?
 
 															########## OPERAÇÃO ##########
 while x==1:
 
-	#refreshsession = requests.post('https://quantum.atlasquantum.com/api/oauth/token', data = granttokenjson)
-	#print (refreshsession.text)
+	#Tenho que checar sessão de novo?
+	#Tenho que dar refresh na sessão?
 
-	#checksession = requests.post('https://quantum.atlasquantum.com/api/checksession', data = refreshtokenjson)
-	#print (checksession.text)
-
-	BTC_balance = requests.get('https://quantum.atlasquantum.com/api/balance/BTC', data = refreshtoken) #check BTC_balance
+	BTC_balance = requests.get('https://quantum.atlasquantum.com/api/balance/BTC', data = refreshtokenjson) #check BTC_balance
 	print("Seu Saldo de BTC é: ",BTC_balance.text)
 	#if BTC_balance > 0:
 		#print("Saldo BTC maior que zero, tentando colocar ordem para comprar BTCQ!")
