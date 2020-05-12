@@ -1,0 +1,89 @@
+import os, requests, time, sys, decimal, urllib, http.client, json
+
+x=1
+cred = []
+
+apiks = open("C:/users/almeq/Documents/apiks.txt",mode='r')
+for line in apiks:
+    cred.append(line.rstrip()) #Add cada linha em uma posição no vetor Cred
+apiks.close()
+
+API_KEY = cred[0] # Add primeira linha do txt em API_key
+API_SECRET = cred[1] # Add segundalinha do txt em API_SECRET
+
+# Authentication
+auth = {"grant_type": "client_credentials", 
+        "api_key": API_KEY, 
+        "api_secret": API_SECRET}
+
+acesso = requests.post('https://quantum.atlasquantum.com/api/oauth/token', data=json.dumps(auth))
+if acesso.status_code == 200:
+	print("Autenticação feita com successo!")
+else:
+	print("Falha na autenticação, verifique a API.")
+	exit(0)
+
+
+dic_r_acesso = json.loads(acesso.text)
+token_type = dic_r_acesso['token_type']
+access_token = dic_r_acesso['access_token']
+refresh_token = dic_r_acesso['refresh_token']
+
+while x == 1:
+	#Check session
+	header = {'Authorization': token_type + " " + access_token}
+	check = requests.get('https://quantum.atlasquantum.com/api/checksession', headers=header)
+	if check.status_code == 200:
+		print("Sessão Verificada!")
+	else:
+		print("Sessão Terminou - necessário refresh_token")
+		#Refresh Token Aqui
+		#Novo Header Aqui
+
+	#Check BTCQ Balance
+	BTCQ_Balance = requests.get('https://quantum.atlasquantum.com/api/balance/BTCQ', headers=header)
+	BTCQ_Balance = json.loads(BTCQ_Balance.text)
+	BTCQ_Balance = BTCQ_Balance['available']
+	BTCQ_Balance = float(BTCQ_Balance)
+	print("Seu Saldo de BTCQ é:", BTCQ_Balance)
+
+	# Sell BTCQ
+	if BTCQ_Balance > 0:
+		print ("Saldo BTCQ maior que zero, tentando colocar ordem para vender BTCQ!")
+		sell = {"symbol":"BTC-BTCQ",
+				"quantity":BTCQ_Balance,
+				"price":"1.00000000"}
+	#			"type":"LIMIT"} na documentação da API tinha essa linha, mas estava dando erro, tirei e funcionou.
+		requestsell = requests.post('https://quantum.atlasquantum.com/api/sell', headers=header, data=json.dumps(sell))
+
+	#check BTC Balance
+	BTC_Balance = requests.get('https://quantum.atlasquantum.com/api/balance/BTC', headers=header)
+	BTC_Balance = json.loads(BTC_Balance.text)
+	BTC_Balance = BTC_Balance['available']
+	BTC_Balance = float(BTC_Balance)
+	print("Seu Saldo de BTC é:", BTC_Balance)
+
+	# Buy BTCQ
+	if BTC_Balance > 0:
+		print ("Saldo BTC maior que zero, tentando colocar ordem para comprar BTCQ!")
+		buy = {"symbol":"BTC-BTCQ",
+				"quantity":BTC_Balance,
+				"price":"0.00010000"}
+	#			"type":"LIMIT"} na documentação da API tinha essa linha, mas estava dando erro, tirei e funcionou.
+		requestbuy = requests.post('https://quantum.atlasquantum.com/api/buy', headers=header, data=json.dumps(buy))
+
+	# Novo Ciclo
+	print("Reiniciando Ciclo em 1s")
+	time.sleep(1)
+
+	# Refresh token
+	#headers = {'Authorization': token_type + " " + access_token,
+	#           'Content-Type': 'text/plain'}
+	#payload = {'grant_type': token_type,
+	#           'refresh_token': refresh_token}
+	#refresh = requests.post('https://quantum.atlasquantum.com/api/oauth/token', data=json.dumps(payload), headers=json.dumps(headers))
+	#dic__r_refresh = json.loads(refresh.text)
+	#token_type = dic__r_refresh['token_type']
+	#access_token = dic__r_refresh['access_token']
+	#refresh_token = dic__r_refresh['refresh_token']
+	
